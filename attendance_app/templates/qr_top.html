@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}退勤登録{% endblock %}
+
+{% block body_class %}qr-top{% endblock %}
+
+{% block content %}
+<div id="headline"
+     class="text-center d-flex flex-column align-items-center w-100 my-4">
+  <h2 class="top_message mb-2">”出勤/退勤”を押してください</h2>
+  <span class="arrow-down fs-1 lh-1">⬇︎</span>
+</div>
+
+
+<div class="d-flex justify-content-center w-100">
+  <button id="start-scan" class="btn btn-info start">出勤/退勤</button>
+</div>
+
+<div id="reader-wrap" class="reader-wrap mx-auto mt-3" style="width:320px; display:none; position:relative;">
+  <div id="reader"></div>
+  <span class="arrow-left" aria-hidden="true">⬅︎</span>
+  <div class="arrow-caption">カメラはこちら</div>
+  <div class="arrow-caption-2">カメラにQRコードを<br>かざしてください</div>
+</div>
+
+{% if user.is_authenticated and user.is_superuser %}
+  <a href="{% url 'attendance:staff_list' %}" class="btn btn-secondary fs-5 mt-3">
+    管理画面
+  </a>
+{% endif %}
+
+<div class="shop_name">
+  <h3>松下クリーニング</h3>
+</div>
+
+{% endblock %}
+
+ <!-- ───────── ここから下は base.html に block を用意している想定 ─────────  -->
+
+ {% block extra_js %}
+ <script src="https://unpkg.com/html5-qrcode@2.3.7/html5-qrcode.min.js"></script>
+ <script>
+ document.addEventListener('DOMContentLoaded', () => {
+   const startBtn  = document.getElementById('start-scan');
+   const readerWrap = document.getElementById('reader-wrap');
+ 
+   // 打刻判定 → （内部で登録）→ qr_done へ redirect してくれる
+   const checkinUrl = "{% url 'attendance:qr_checkin' %}";
+ 
+   const onSuccess = decodedText => {
+     const token = decodedText.trim();   // 必要ならここでトークン抽出処理
+     // GET で token を渡す（qr_checkin が qr_done へリダイレクト）
+     window.location.href = `${checkinUrl}?token=${encodeURIComponent(token)}`;
+   };
+ 
+   startBtn.addEventListener('click', () => {
+     startBtn.style.display = 'none';
+     readerWrap.style.display = 'block';
+     const qr = new Html5Qrcode('reader');
+     const vw = window.innerWidth || document.documentElement.clientWidth;
+     const isTablet8 = vw >= 600 && vw <= 950; // 8インチ級を広めに判定
+     document.body.classList.toggle('is-8inch', isTablet8);
+     qr.start(
+       { facingMode: 'user' },
+       {
+         fps: 10,
+         qrbox: null, // ← フルスクリーンにする
+         aspectRatio: 1.333, // カメラ映像比を調整（必要なら削除可）
+         disableFlip: true
+       },
+       onSuccess
+     );
+   });
+
+   window.addEventListener('resize', () => {
+     const w = window.innerWidth || document.documentElement.clientWidth;
+     const is8 = w >= 600 && w <= 950;
+     document.body.classList.toggle('is-8inch', is8);
+   });
+ });
+ </script>
+
+
+<!-- カメラ起動時 -->
+<script>
+  const msgEl   = document.querySelector('#headline .top_message');
+  const arrowEl = document.querySelector('#headline .arrow-down');
+  const readerWrap  = document.getElementById('reader-wrap');
+  const startBt = document.getElementById('start-scan');
+  const arrowCap = document.querySelector('#reader-wrap .arrow-caption');
+  const arrowCap2 = document.querySelector('#reader-wrap .arrow-caption-2');
+
+  // 元の矢印を記憶（未設定ならデフォルトで⬇︎）
+  arrowEl.dataset.orig = arrowEl.textContent || '⬇︎';
+
+  function enterScanUIMode(){
+    if (arrowCap) arrowCap.textContent = 'カメラはこちら';
+    if (arrowCap2) arrowCap2.innerHTML = 'カメラに<br>QRコードを<br>かざしてください';
+    {
+      const w = window.innerWidth || document.documentElement.clientWidth;
+      if (w >= 600 && w <= 950 && arrowCap2) {
+        arrowCap2.style.fontSize = '20px';
+      }
+    }
+    msgEl.style.display = 'none';
+
+    // 矢印の方向
+    arrowEl.textContent = '⬅︎';
+
+    // スキャン中フラグ（CSS 切替）
+    document.body.classList.add('scanner-on');
+
+    // 念のため readerWrap を表示
+    readerWrap.style.display = 'block';
+  }
+
+  function leaveScanUIMode(){
+    if (arrowCap) arrowCap.textContent = '';
+    if (arrowCap2) arrowCap2.innerHTML = '';
+    msgEl.style.display = '';
+    msgEl.textContent = '”出勤/退勤”を押してください';
+    arrowEl.textContent = arrowEl.dataset.orig || '⬇︎'; // 元に戻す
+    document.body.classList.remove('scanner-on');
+    readerWrap.style.display = 'none';
+  }
+
+  startBt?.addEventListener('click', () => {
+    enterScanUIMode();
+    // ここで QR スキャン開始（完了/停止時に leaveScanUIMode() を呼んで戻す）
+  });
+
+  // 「読み取り開始」クリックで UI 切替 → あなたのカメラ開始処理へ
+  startBt?.addEventListener('click', () => {
+    enterScanUIMode();
+
+    // ここで html5-qrcode などの開始処理を実行
+    // new Html5Qrcode("reader").start(...).then(...).catch(...);
+
+    // スキャン完了/停止時は leaveScanUIMode() を呼んで戻してください
+    // 例:
+    // html5Qrcode.stop().then(leaveScanUIMode);
+  });
+</script>
+
+
+
+ {% endblock %}
+
+
+
+</file>

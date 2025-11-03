@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}打刻編集{% endblock %}
+{% block content %}
+<h2 class="text-xl font-bold mb-4">打刻編集</h2>
+<form method="post">{% csrf_token %}
+  {{ form.as_p }}
+  <button class="px-4 btn btn-outline-success">
+    保存
+  </button>
+</form>
+{% endblock %}

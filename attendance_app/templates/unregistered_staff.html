@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}登録されていないスタッフ{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="alert alert-warning text-center">
+    <h2 class="mb-3">登録されていないスタッフ</h2>
+    <p>この QR コードは登録されていないスタッフです。</p>
+    <a href="{% url 'attendance:qr_top' %}" class="btn btn-primary mt-3">
+      トップに戻る
+    </a>
+  </div>
+</div>
+{% endblock %}

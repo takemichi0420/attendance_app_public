@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}ログイン{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 420px;">
+  <h2 class="mb-4">ログイン</h2>
+
+  {% if form.errors %}
+    <div class="alert alert-danger">ユーザー名またはパスワードが違います。</div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="mb-3">
+      {{ form.username.label_tag }}
+      {{ form.username }}
+      {{ form.username.errors }}
+    </div>
+    <div class="mb-3">
+      {{ form.password.label_tag }}
+      {{ form.password }}
+      {{ form.password.errors }}
+    </div>
+    <button class="btn btn-primary w-100">ログイン</button>
+  </form>
+</div>
+{% endblock %}

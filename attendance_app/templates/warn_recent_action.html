@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登録間隔が短すぎます</title>
+    <!-- 🔽 5秒後に /qr_top/ へリダイレクト -->
+  <meta http-equiv="refresh" content="5; url={% url 'attendance:qr_top' %}">
+    <style>
+        body { font-family: sans-serif; text-align: center; margin-top: 60px; }
+        h2 { color: darkred; }
+      </style>
+</head>
+<body>
+<h2>前回の{{ last_action }}から1分未満です</h2>
+  <p>時刻：{{ last_time|date:"Y年m月d日 H:i:s" }}</p>
+  <p>連続打刻の可能性があるため、登録はキャンセルされました。</p>
+  <p>5秒後にトップ画面へ戻ります</p>
+
+  <p>差分（秒）: {{ diff_seconds }}</p>
+</body>
+</html>

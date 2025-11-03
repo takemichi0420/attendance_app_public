@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}QRコード{% endblock %}
+{% block content %}
+<div class="staff-qr-container">
+  <h2 class="mb-3">{{ object.staff.name }} さんの QR コード</h2>
+  {% if object.qr_image %}
+     <img src="{% url 'attendance:staff_qr_png' object.pk %}?v={{ object.qr_token }}" 
+     class="img-fluid border" style="max-width:400px">
+  {% else %}
+     <p>QR 画像が登録されていません</p>
+  {% endif %}
+
+ <!-- ボタンに URL を埋め込む -->
+ <button
+   id="qr-close-btn"
+   type="button"
+   class="btn btn-secondary"
+   data-redirect-url="{% url 'attendance:staff_list' %}"
+   >
+   閉じる
+ </button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+   document.addEventListener('DOMContentLoaded', () => {
+   const btn = document.getElementById('qr-close-btn');
+   btn.addEventListener('click', () => {
+   if (window.opener && !window.opener.closed) {
+      // ポップアップなら閉じる
+      window.close();
+   } else {
+      // そうでなければ data-属性の URL へ飛ぶ
+      window.location.href = btn.dataset.redirectUrl;
+   }
+   });
+   });
+</script>
+{% endblock %}

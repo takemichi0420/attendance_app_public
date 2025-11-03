@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}警告{% endblock %}
+{% block content %}
+    <div style="text-align:center; margin-top:3rem;">
+        <h2 style="font-size:1.5rem; color:#e3342f;">管理者以外はアクセスできません</h2>
+        <p class="mt-4">
+          <a href="{% url 'attendance:qr_top' %}" style="color:#3490dc; text-decoration:underline;">
+            トップへ戻る
+          </a>
+        </p>
+    </div>
+         <!-- 任意で同じ POST ログアウトフォーム -->
+  <form method="post" action="{% url 'attendance:logout' %}" class="mt-6 inline-block">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{% url 'attendance:login' %}">
+    <button type="submit" class="btn btn-secondary px-3 py-1 bg-gray-600 text-white rounded">
+        ログアウト
+    </button>
+  </form>
+        
+{% endblock %}

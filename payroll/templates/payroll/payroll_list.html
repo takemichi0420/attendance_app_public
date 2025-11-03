@@ -1,0 +1,90 @@
+{# templates/payroll/payroll_list.html #}
+{% extends "base.html" %}
+
+{% block title %}給与スタッフ{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="mb-0">給与スタッフ</h1>
+
+  <form method="get" class="d-flex align-items-center gap-2">
+    <input type="month" name="ym" class="form-control form-control-sm"
+           value="{{ month_input_value }}">
+    <button class="btn btn-outline-primary btn-sm">表示</button>
+    <a href="{% url 'payroll:staff_export_csv' %}?ym={{ selected_ym }}"
+       class="btn btn-outline-secondary btn-sm">CSV</a>
+    <a href="{% url 'attendance:staff_create' %}" class="btn btn-success btn-sm">＋ 新規登録</a>
+    <a href="{% url 'attendance:staff_list' %}?ym={{ ym }}" class="btn btn-sm btn-outline-secondary">
+      ← 一覧へ戻る
+    </a>
+  </form>
+</div>
+
+<table class="table table-striped align-middle">
+  <thead>
+    <tr>
+      <th style="width:80px;">ID</th>
+      <th>氏名</th>
+
+      <!-- 並び：基本給 / 休日 / 特別 / 通勤 / 総支給 / 年金 / 健保 / 社保合計 / 住民税 / 源泉 / 差引 -->
+      <th class="text-end">基本給</th>
+      <th class="text-end">休日手当</th>
+      <th class="text-end">特別期間</th>
+      <th class="text-end">通勤手当</th>
+      <th class="text-end">総支給額</th>
+      <th class="text-end">厚生年金</th>
+      <th class="text-end">健康保険</th>
+      <th class="text-end">社会保険合計</th>
+      <th class="text-end">雇用保険</th>
+      <th class="text-end">住民税</th>
+      <th class="text-end">源泉</th>
+      <th class="text-end">差引支給額</th>
+      <th style="width:160px;">操作</th>
+    </tr>
+  </thead>
+
+  <tbody>
+  {% for s in staffs %}
+    <tr>
+      <td>{{ s.id }}</td>
+      <td>{{ s.name }}</td>
+
+      <td class="text-end">¥{{ s.basic_pay|yenfmt }}</td>
+      <td class="text-end">¥{{ s.allow_holiday|yenfmt }}</td>
+      <td class="text-end">¥{{ s.allow_special|yenfmt }}</td>
+      <td class="text-end">¥{{ s.commute_allowance|yenfmt }}</td>
+      <td class="text-end fw-semibold">¥{{ s.gross_pay|yenfmt }}</td>
+
+      <td class="text-end">¥{{ s.pension|yenfmt }}</td>
+      <td class="text-end">¥{{ s.health_ins|yenfmt }}</td>
+      <td class="text-end">¥{{ s.social_ins_total|yenfmt }}</td>
+      <td class="text-end">¥{{ s.employment_ins|yenfmt }}</td>
+      <td class="text-end">¥{{ s.resident_tax|yenfmt }}</td>
+      <td class="text-end">¥{{ s.withholding_tax|yenfmt }}</td>
+      <td class="text-end fw-semibold">¥{{ s.net_pay|yenfmt }}</td>
+
+      <td>
+        <div class="d-flex gap-2">
+          <a href="{% url 'payroll:staff_edit' s.pk %}" class="btn btn-primary btn-sm">編集</a>
+          <a href="{% url 'payroll:staff_delete' s.pk %}" class="btn btn-outline-danger btn-sm"
+             onclick="return confirm('削除してよろしいですか？');">削除</a>
+        </div>
+      </td>
+    </tr>
+
+    <!-- {# サブ行（勤務時間を四捨五入で表示） #} -->
+    <tr class="table-light">
+      <td colspan="14">
+        <div class="small ps-1">
+          <span class="text-muted">通常</span> {{ s.hours_normal }} h
+          <span class="text-muted ms-3">特別</span> {{ s.hours_special }} h
+          <span class="text-muted ms-3">休日</span> {{ s.hours_holiday }} h
+        </div>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="14" class="text-muted">登録されたスタッフがいません</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

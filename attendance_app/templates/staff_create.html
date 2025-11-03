@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}新規スタッフ作成{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">新規スタッフ作成</h2>
+
+{% if form.errors %}
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      {% for field in form %}
+        {% for error in field.errors %}
+          <li>{{ field.label }}: {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+      {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+<form method="post" class="card p-4" style="max-width:420px">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+
+  <!-- 氏名 -->
+  <div class="mb-3">
+    {{ form.name.label_tag }}
+    {{ form.name }}
+    {% if form.name.errors %}
+      <div class="text-danger small">{{ form.name.errors|striptags }}</div>
+    {% endif %}
+  </div>
+
+  <!-- 賃金種別（ラジオ） -->
+  <div class="mb-3">
+    <label class="form-label">賃金種別:</label><br>
+    {% for opt in form.wage_type %}
+      <div class="form-check form-check-inline">
+        {{ opt.tag }}
+        <label class="form-check-label ms-1">{{ opt.choice_label }}</label>
+      </div>
+    {% endfor %}
+    {% if form.wage_type.errors %}
+      <div class="text-danger small">{{ form.wage_type.errors|striptags }}</div>
+    {% endif %}
+  </div>
+
+  <!-- 時給：時給選択時のみ表示 -->
+  <div class="mb-3 js-wage-field" data-when="hourly">
+    {{ form.hourly_rate.label_tag }}
+    {{ form.hourly_rate }}
+    {% if form.hourly_rate.errors %}
+      <div class="text-danger small">{{ form.hourly_rate.errors|striptags }}</div>
+    {% endif %}
+    <div class="form-text">例: 1400</div>
+  </div>
+
+  <!-- 固定給：固定給選択時のみ表示 -->
+  <div class="mb-3 js-wage-field" data-when="salary">
+    {{ form.monthly_salary.label_tag }}
+    {{ form.monthly_salary }}
+    {% if form.monthly_salary.errors %}
+      <div class="text-danger small">{{ form.monthly_salary.errors|striptags }}</div>
+    {% endif %}
+    <div class="form-text">例: 300000</div>
+  </div>
+
+  <hr>
+  <h5>控除・手当</h5>
+  {{ pi_form.as_p }}
+
+  <button class="btn btn-primary w-100 mt-3">登録</button>
+</form>
+
+<p class="mt-4"><a href="{% url 'attendance:qr_top' %}">← トップへ</a></p>
+<p><a href="{% url 'attendance:login' %}">← ログインへ</a></p>
+
+<script>
+  (function () {
+    function toggleWage() {
+      const checked = document.querySelector('input[name="wage_type"]:checked');
+      const val = (checked && checked.value) ? checked.value.toLowerCase() : 'hourly';
+      document.querySelectorAll('.js-wage-field').forEach(block => {
+        const show = block.dataset.when === val;
+        block.classList.toggle('d-none', !show);
+        const input = block.querySelector('input,select,textarea');
+        if (input) {
+          if (show) input.removeAttribute('disabled');
+          else input.setAttribute('disabled', 'disabled');
+        }
+      });
+    }
+    document.addEventListener('change', e => {
+      if (e.target && e.target.name === 'wage_type') toggleWage();
+    });
+    document.addEventListener('DOMContentLoaded', toggleWage);
+  })();
+</script>
+{% endblock %}

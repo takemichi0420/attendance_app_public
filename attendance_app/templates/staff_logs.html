@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ staff.name }} の勤怠履歴{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 960px;">
+  <h2 class="mb-3">{{ staff.name }} の勤怠履歴</h2>
+
+  <!-- ── 検索フォーム（GET） ───────────────────────────── -->
+  <form method="get" class="mb-4 d-flex gap-3 align-items-end flex-wrap">
+    <div>
+      <label class="form-label mb-1">開始日</label>
+      {{ form.date_from }}
+    </div>
+    <div>
+      <label class="form-label mb-1">終了日</label>
+      {{ form.date_to }}
+    </div>
+
+    <button class="btn btn-primary ms-2 btn-lg d-flex align-items-center">
+      検索
+    </button>
+
+    {% url 'attendance:staff_logs' staff.id as staff_logs_url %}
+    <button type="button"
+            class="btn btn-secondary btn-lg d-flex align-items-center"
+            onclick="location.href='{{ staff_logs_url }}'">
+      クリア
+    </button>
+
+    <a href="{% url 'attendance:staff_list' %}"
+    class="btn btn-secondary btn-lg d-flex align-items-center">
+   一覧へ戻る
+    </a>  
+
+  </form>
+
+  <!-- ── 一覧 ─────────────────────────────────────────── -->
+  <table class="table table-striped align-middle">
+    <thead>
+      <tr>
+        <th style="width: 30%;">日時</th>
+        <th style="width: 20%;">区分</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for log in logs %}
+      <tr>
+        <td>{{ log.timestamp|date:"Y-m-d H:i" }}</td>
+        <td>{{ log.get_action_display }}</td>
+        <td>
+          <a href="{% url 'attendance:log_edit' log.id %}"
+             class="btn btn-sm btn-outline-primary me-2">編集</a>
+
+          <!-- 削除（モーダル起動） -->
+          <button type="button"
+          class="btn btn-sm btn-outline-danger"
+          data-bs-toggle="modal"
+          data-bs-target="#deleteModal"
+          data-id="{{ log.id }}"
+          data-datetime="{{ log.timestamp|date:'Y-m-d H:i' }}"
+          data-url="{% url 'attendance:log_delete' log.id %}">
+          削除
+    </button>
+      </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="3" class="text-center text-muted">記録がありません</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {# ページネーション（必要な場合だけ表示） #}
+  {% if is_paginated %}
+    <nav aria-label="ページネーション">
+      <ul class="pagination">
+        {% if page_obj.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{{ request.GET.urlencode|yesno:',&' }}{{ request.GET.urlencode }}">{{ '«' }}</a></li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">«</span></li>
+        {% endif %}
+        <li class="page-item active"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{{ request.GET.urlencode|yesno:',&' }}{{ request.GET.urlencode }}">{{ '»' }}</a></li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">»</span></li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+</div>
+
+<!-- ── 削除モーダル（Bootstrap 5） ───────────────────── -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="deleteModalLabel">打刻削除の確認</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+    </div>
+    <div class="modal-body">
+      以下の打刻を削除しますか？<br>
+      <strong id="modalDatetime"></strong>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+      <form id="deleteForm" method="post" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">削除する</button>
+      </form>
+    </div>
+  </div></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('deleteModal');
+  modal.addEventListener('show.bs.modal', (event) => {
+    const btn = event.relatedTarget;
+    const url = btn.getAttribute('data-url');               // 例: /attendance/log/13/delete/
+    const dt  = btn.getAttribute('data-datetime');
+
+    modal.querySelector('#modalDatetime').textContent = dt;
+    modal.querySelector('#deleteForm').setAttribute('action', url);
+  });
+});
+</script>
+{% endblock %}

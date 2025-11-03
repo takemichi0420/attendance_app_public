@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}スタッフ登録{% endblock %}
+
+{% block content %}
+<form method="post" novalidate>
+  {% csrf_token %}
+
+  <!-- {# ---------- 1. 氏名など ---------- #} -->
+  <div class="mb-3">
+    {{ form.name.label_tag }}
+    {{ form.name|add_class:"form-control" }}
+    {% if form.name.errors %}
+      <div class="text-danger small">{{ form.name.errors|striptags }}</div>
+    {% endif %}
+  </div>
+
+
+
+  <!-- {# ---------- 2. 賃金種別（ラジオボタン） ---------- #} -->
+  <div class="mb-3">
+    <label class="form-label">賃金種別:</label><br>
+    {% for choice in form.wage_type %}
+      <div class="form-check form-check-inline">
+        {{ choice.tag }}        {# input 要素 #}
+        <label class="form-check-label ms-1">
+          {{ choice.choice_label }}
+        </label>
+      </div>
+    {% endfor %}
+    {% if form.wage_type.errors %}
+      <div class="text-danger small">{{ form.wage_type.errors|striptags }}</div>
+    {% endif %}
+  </div>
+
+  <!-- {# ---------- 3. 時給・月給など残りのフィールド ---------- #} -->
+  <div class="mb-3">
+    {{ form.hourly_rate.label_tag }}
+    {{ form.hourly_rate|add_class:"form-control" }}
+  </div>
+
+  <div class="mb-3">
+    {{ form.monthly_salary.label_tag }}
+    {{ form.monthly_salary|add_class:"form-control" }}
+  </div>
+
+  <!-- 控除・手当 -->
+  <hr class="my-4">
+  <h5>控除・手当</h5>
+
+  <!-- 雇用保険加入 -->
+  <div class="mb-3 form-check">
+    {{ pi_form.employment_insured }}
+    <label class="form-check-label" for="{{ pi_form.employment_insured.id_for_label }}">
+      {{ pi_form.employment_insured.label }}
+    </label>
+  </div>
+
+  <div class="row gx-2">
+    <div class="col">
+      {{ pi_form.commute_allowance.label_tag }}
+      {{ pi_form.commute_allowance }}
+    </div>
+    <div class="col">
+      {{ pi_form.health_insurance.label_tag }}
+      {{ pi_form.health_insurance }}
+    </div>
+    <div class="col">
+      {{ pi_form.pension.label_tag }}
+      {{ pi_form.pension }}
+    </div>
+  </div>
+
+  <div class="row gx-2 mt-2">
+    <div class="col">
+      {{ pi_form.resident_tax.label_tag }}
+      {{ pi_form.resident_tax }}
+    </div>
+    <div class="col">
+      {{ pi_form.withholding_tax.label_tag }}
+      {{ pi_form.withholding_tax }}
+    </div>
+  </div>
+
+  <button class="btn btn-primary" type="submit">保存</button>
+  <a href="{% url 'attendance:staff_list' %}" class="btn btn-secondary">戻る</a>
+</form>
+
+<!-- エラーメッセージ -->
+{% if pi_form.errors %}
+  <div class="alert alert-danger">
+    入力内容にエラーがあります（控除・手当）:
+    <ul class="mb-0">
+      {% for field, errors in pi_form.errors.items %}
+        {% for err in errors %}
+          <li>{{ field }}：{{ err }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  </div>
+
+  {% endif %}
+{% endblock %}

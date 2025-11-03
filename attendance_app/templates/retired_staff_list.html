@@ -1,0 +1,49 @@
+
+{% extends "base.html" %}
+{% block title %}退職者一覧{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="fw-bold mb-4">退職者一覧</h1>
+  
+  <a href="{% url 'attendance:staff_list' %}?ym={{ ym }}" class="btn btn-sm btn-outline-secondary">
+    ← 一覧へ戻る
+  </a>
+
+  <table class="table table-striped align-middle">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>氏名</th>
+        <th>退職日</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for staff in staffs %}
+      <tr>
+        <td>{{ staff.id|stringformat:"03d" }}</td>
+        <td>
+          <a href="{% url 'payroll:payroll_staff_detail' staff.pk %}">{{ staff.name }}</a>
+        </td>
+        <td>{{ staff.retired_date|default:"未登録" }}</td>
+        <td class="d-flex gap-2">
+          <a href="{% url 'attendance:staff_logs' staff.pk %}" class="btn btn-outline-primary btn-sm">Log</a>
+          <form action="{% url 'attendance:rehire_staff' staff.pk %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success btn-sm"
+                    onclick="return confirm('{{ staff.name }} さんを復職させますか？');">
+              復職
+            </button>
+          </form>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4" class="text-center text-muted">退職者はいません。</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
+

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<form 
+    method="post"
+    hx-post="."
+    hx-target="body"
+    hx-swap="innerHTML"
+>
+  {% csrf_token %}
+
+  {{ form.wage_type }}  {# 賃金種別ラジオ #}
+
+  <div id="wage-fields"
+       hx-get="{% url 'payroll:staff_subform' %}"
+       hx-trigger="change from:input[name='wage_type']"
+       hx-target="#wage-fields"
+       hx-include="input[name='wage_type']"
+       hx-swap="innerHTML">
+    {% include 'payroll/partials/fields_hourly.html' %}
+  </div>
+
+  {# ------- ここに PayrollInfo の項目を追加する -------- #}
+  <hr class="my-4">
+  <h5 class="mb-3">控除・保険・手当</h5>
+
+  <div class="row g-3">
+    <div class="col-12 form-check">
+      {{ pi_form.employment_insured|add_class:"form-check-input" }}
+      {{ pi_form.employment_insured.label_tag }}
+      {% for e in pi_form.employment_insured.errors %}
+        <div class="invalid-feedback d-block">{{ e }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">{{ pi_form.deduct_method.label }}</label>
+      {{ pi_form.deduct_method|add_class:"form-select" }}
+      {% for e in pi_form.deduct_method.errors %}
+        <div class="invalid-feedback d-block">{{ e }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">{{ pi_form.commute_allowance.label }}</label>
+      {{ pi_form.commute_allowance|add_class:"form-control" }}
+      {% for e in pi_form.commute_allowance.errors %}
+        <div class="invalid-feedback d-block">{{ e }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">{{ pi_form.health_insurance.label }}</label>
+      {{ pi_form.health_insurance|add_class:"form-control" }}
+      {% for e in pi_form.health_insurance.errors %}
+        <div class="invalid-feedback d-block">{{ e }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">{{ pi_form.pension.label }}</label>
+      {{ pi_form.pension|add_class:"form-control" }}
+      {% for e in pi_form.pension.errors %}
+        <div class="invalid-feedback d-block">{{ e }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">{{ pi_form.resident_tax.label }}</label>
+      {{ pi_form.resident_tax|add_class:"form-control" }}
+      {% for e in pi_form.resident_tax.errors %}
+        <div class="invalid-feedback d-block">{{ e }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">{{ pi_form.withholding_tax.label }}</label>
+      {{ pi_form.withholding_tax|add_class:"form-control" }}
+      {% for e in pi_form.withholding_tax.errors %}
+        <div class="invalid-feedback d-block">{{ e }}</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <button class="btn btn-primary mt-4">保存</button>
+</form>
+
+{# サブフォームのエラー #}
+{% if subform.errors %}
+<div class="alert alert-danger mt-3">
+  <ul class="mb-0">
+    {% for field in subform %}
+      {% for err in field.errors %}
+        <li>{{ field.label }}：{{ err }}</li>
+      {% endfor %}
+    {% endfor %}
+    {% for err in subform.non_field_errors %}
+      <li>{{ err }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{# PayrollInfo のエラー #}
+{% if pi_form.errors %}
+<div class="alert alert-danger mt-3">
+  <ul class="mb-0">
+    {% for field in pi_form %}
+      {% for err in field.errors %}
+        <li>{{ field.label }}：{{ err }}</li>
+      {% endfor %}
+    {% endfor %}
+    {% for err in pi_form.non_field_errors %}
+      <li>{{ err }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% endblock %}

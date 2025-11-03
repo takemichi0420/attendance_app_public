@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}スタッフ削除確認{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">スタッフ削除</h2>
+<p>本当に <strong>{{ object.name }}</strong> を削除しますか？</p>
+
+<form method="post">
+  {% csrf_token %}
+  <button class="btn btn-danger">削除</button>
+  <a href="{% url 'attendance:staff_list' %}" class="btn btn-secondary">キャンセル</a>
+</form>
+{% endblock %}

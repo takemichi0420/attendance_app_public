@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}スタッフ編集{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="fw-bold mb-3">スタッフ情報編集</h1>
+
+  <form method="post" class="w-50">
+    {% csrf_token %}
+
+    <!-- 今開いている年月を hidden で保持 -->
+    <input type="hidden" name="ym" value="{{ ym }}">
+
+    <!-- 氏名 -->
+    <div class="mb-3">
+      <label class="form-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+      {{ form.name.as_widget|safe }}
+      {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors }}</div>{% endif %}
+    </div>
+
+    <!-- 賃金種別（ラジオを横並びに） -->
+    <div class="mb-3">
+      <label class="form-label d-block">賃金種別</label>
+      {% for opt in form.wage_type %}
+        <div class="form-check form-check-inline">
+          {{ opt.tag }}
+          <label class="form-check-label" for="{{ opt.id_for_label }}">{{ opt.choice_label }}</label>
+        </div>
+      {% endfor %}
+      {% if form.wage_type.errors %}<div class="text-danger small">{{ form.wage_type.errors }}</div>{% endif %}
+    </div>
+
+    <!-- 時給 -->
+    <div class="mb-3" id="hourly-wrapper">
+      <label class="form-label" for="{{ form.hourly_rate.id_for_label }}">{{ form.hourly_rate.label }}</label>
+      {{ form.hourly_rate.as_widget|safe }}
+      {% if form.hourly_rate.errors %}<div class="text-danger small">{{ form.hourly_rate.errors }}</div>{% endif %}
+      <div class="form-text">例: 1400</div>
+    </div>
+
+    <!-- 固定給 -->
+    <div class="mb-3" id="salary-wrapper">
+      <label class="form-label" for="{{ form.monthly_salary.id_for_label }}">{{ form.monthly_salary.label }}</label>
+      {{ form.monthly_salary.as_widget|safe }}
+      {% if form.monthly_salary.errors %}<div class="text-danger small">{{ form.monthly_salary.errors }}</div>{% endif %}
+    </div>
+
+    <hr class="my-4">
+    <h5 class="mb-3">在籍状態</h5>
+    <div class="mb-3 form-check">
+      {{ form.is_retired }}
+      <label class="form-check-label" for="{{ form.is_retired.id_for_label }}">退職済みにする</label>
+    </div>
+    <hr class="my-4">
+    <h5 class="mb-3">控除・手当</h5>
+
+
+    <!-- 雇用保険加入 -->
+    <div class="mb-3 form-check">
+      {{ pi_form.employment_insured.as_widget|safe }}
+      <label class="form-check-label" for="{{ pi_form.employment_insured.id_for_label }}">{{ pi_form.employment_insured.label }}</label>
+      {% if pi_form.employment_insured.errors %}<div class="text-danger small">{{ pi_form.employment_insured.errors }}</div>{% endif %}
+    </div>
+
+    <!-- 住民税等：数値入力は form-control として扱う -->
+    <div class="mb-3">
+      <label class="form-label" for="{{ pi_form.resident_tax.id_for_label }}">{{ pi_form.resident_tax.label }}</label>
+      {{ pi_form.resident_tax.as_widget|safe }}
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="{{ pi_form.withholding_tax.id_for_label }}">{{ pi_form.withholding_tax.label }}</label>
+      {{ pi_form.withholding_tax.as_widget|safe }}
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="{{ pi_form.health_insurance.id_for_label }}">{{ pi_form.health_insurance.label }}</label>
+      {{ pi_form.health_insurance.as_widget|safe }}
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="{{ pi_form.pension.id_for_label }}">{{ pi_form.pension.label }}</label>
+      {{ pi_form.pension.as_widget|safe }}
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="{{ pi_form.commute_allowance.id_for_label }}">{{ pi_form.commute_allowance.label }}</label>
+      {{ pi_form.commute_allowance.as_widget|safe }}
+    </div>
+
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+    <div class="mt-3">
+      <button class="btn btn-primary">保存</button>
+      <a href="{{ next|default:'/' }}" class="btn btn-secondary ms-2">キャンセル</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  (function () {
+    // 「時給/固定給」の切り替え
+    const hourlyWrap = document.getElementById('hourly-wrapper');
+    const salaryWrap = document.getElementById('salary-wrapper');
+    const radios = document.querySelectorAll('input[name="{{ form.wage_type.name }}"]');
+
+    function toggle() {
+      const val = document.querySelector('input[name="{{ form.wage_type.name }}"]:checked')?.value;
+      // 値はあなたの WageType に合わせて。例: "hourly" / "salary" など
+      hourlyWrap.style.display = (val === 'hourly') ? '' : 'none';
+      salaryWrap.style.display = (val === 'salary') ? '' : 'none';
+    }
+    radios.forEach(r => r.addEventListener('change', toggle));
+    toggle();
+  })();
+</script>
+{% endblock %}

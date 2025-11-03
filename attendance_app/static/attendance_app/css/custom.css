@@ -1,0 +1,373 @@
+/* qr_top.html */
+.top_message {
+  font-size: 53px;
+  margin-top: 20%;
+  font-weight: 1000;
+  white-space: pre-line;
+  /* 白い縁取り（Chrome/Safari は text-stroke、Firefox は text-shadow で代替） */
+  -webkit-text-stroke: 1px #33c7f8;         /* 対応ブラウザでは綺麗な縁取り */
+  text-shadow:
+    2px 0 0 #fff, -1px 0 0 #fff,
+    0 2px 0 #fff,  0 -1px 0 #fff,
+    1px 1px 0 #fff, -1px 1px 0 #fff,
+    1px -1px 0 #fff,-1px -1px 0 #fff;
+}
+
+
+/* PC（Bootstrapの lg 以上 = 992px〜）では上余白を 0 に */
+@media (min-width: 992px){
+  .top_message{
+    margin-top: 0 !important;
+    font-size: 30px;
+  }
+}
+
+.text-center {
+  margin-top: 0% !important;
+}
+
+/* 上下に“伸び縮み”する */
+#headline .arrow-down{
+  position: static !important;
+  float: none !important;
+  display: inline-block;
+  margin-top: .25rem;
+  font-size: 150px !important;
+  color: red;
+
+  /* ここから追加 */
+  transform-origin: top center;           /* 上端を基準に伸縮 */
+  animation: stretchDown 1.1s ease-in-out infinite alternate;
+}
+
+@keyframes stretchDown{
+  0%   { transform: scaleY(0.7) translateY(0);   opacity: .9; }
+  60%  { transform: scaleY(1.25) translateY(8px); opacity: 1; }
+  100% { transform: scaleY(0.7)  translateY(0);  opacity: .9; }
+}
+
+/* 動きを抑制したい環境への配慮（任意） */
+@media (prefers-reduced-motion: reduce){
+  #headline .arrow-down{ animation: none; }
+}
+
+
+/* ===== デフォルト（未起動） =====
+   いまの見た目と動きはそのまま（あなたの定義を利用） */
+   #headline .top_message { order: 1; }   /* 既定：テキスト → 矢印 の順 */
+   #headline .arrow-down  { order: 2; }
+   
+   /* ===== カメラ起動中だけ適用 ===== */
+   .scanner-on #reader{
+     display: block !important;
+     /* カメラを大きく（端末幅の 70% か 420px の小さい方） */
+     width: min(70vw, 420px) !important;
+     margin: 1rem auto !important;
+   }
+   .scanner-on #start-scan{ display:none; }    /* 開始ボタンは隠す（任意） */
+   
+   /* 見出しの並びを「矢印 → テキスト」に入れ替え */
+   .scanner-on #headline .arrow-down  { order: 1; }
+   .scanner-on #headline .top_message { order: 2; }
+   
+   /* スキャン中は矢印を“レンズ方向にグーンと伸ばす” */
+   .scanner-on #headline .arrow-down{
+     /* 同じ記号⬇︎を使いつつ伸ばす。数値はお好みで調整 */
+     font-size: clamp(120px, 14vw, 220px) !important;
+     transform-origin: top center;
+     animation: stretchToLens 1.1s ease-in-out infinite alternate !important;
+     margin-bottom: .3rem;
+     margin-top: 0%;
+   }
+
+   @media (min-width: 992px){
+    .scanner-on #headline .arrow-down{
+      display: none;
+    }
+  }
+    
+   
+   /* 伸びる量（vh を上げるとよりレンズ方向に伸びます）*/
+   @keyframes stretchToLens{
+     0%   { transform: scaleY(.75) translateY(0);   opacity: .95; }
+     60%  { transform: scaleY(1.6) translateY(6vh); opacity: 1;   }
+     100% { transform: scaleY(.75) translateY(0);   opacity: .95; }
+   }
+   
+   /* 動きを抑えたい環境への配慮（任意） */
+   @media (prefers-reduced-motion: reduce){
+     .scanner-on #headline .arrow-down{ animation: none !important; }
+   }
+
+
+.start {
+  font-size: 60px;
+  margin-top: 3%;
+  letter-spacing: 0.6em;
+  box-shadow: 17px 21px 11px 1px #333333;
+  border-radius: 10px;
+}
+
+.shop_name {
+  text-align: right;
+  margin-top: 300px;
+  white-space: pre-line;
+  /* 白い縁取り（Chrome/Safari は text-stroke、Firefox は text-shadow で代替） */
+  -webkit-text-stroke: 0.5px #33c7f8;         /* 対応ブラウザでは綺麗な縁取り */
+  text-shadow:
+    0.5px 0 0 #fff, -1px 0 0 #fff,
+    0 2px 0 #fff,  0 -1px 0 #fff,
+    1px 1px 0 #fff, -1px 1px 0 #fff,
+    1px -1px 0 #fff,-1px -1px 0 #fff;
+}
+
+.arrowCap.textContent {
+  text-align: left;
+}
+
+/* --- エラーページ専用スタイル --- */
+.error-container {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border: 3px solid #dc3545;
+  border-radius: 1rem;
+  background-color: #fff5f5;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* PC・タブレット共通 */
+.error-title {
+  font-weight: bold;
+  color: #dc3545;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.error-message {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.error-sub {
+  color: #6c757d;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.error-btn {
+  padding: 0.8rem 2rem;
+  border-radius: 0.8rem;
+  display: inline-block;
+  text-align: center;
+}
+
+/* --- タブレット（横幅600〜900px） --- */
+@media (max-width: 900px) {
+  .error-title { font-size: 1.6rem; }
+  .error-message { font-size: 1.1rem; }
+  .error-sub { font-size: 0.95rem; }
+  .error-btn { font-size: 1.1rem; width: 100%; }
+}
+
+/* --- スマホ/小型タブレット（横幅600px以下） --- */
+@media (max-width: 600px) {
+  .error-container { padding: 1.5rem; }
+  .error-title { font-size: 1.4rem; }
+  .error-message { font-size: 1rem; }
+  .error-sub { font-size: 0.9rem; }
+  .error-btn { font-size: 1rem; width: 100%; padding: 0.7rem; }
+}
+
+/* --- PC（横幅900px以上） --- */
+@media (min-width: 901px) {
+  .error-title { font-size: 2rem; }
+  .error-message { font-size: 1.25rem; }
+  .error-sub { font-size: 1rem; }
+  .error-btn { font-size: 1.2rem; }
+}
+
+
+
+/* pstroll_config.html */
+
+.text-danger.special_rate.mb-3 {
+  text-align: right;
+  margin-top: 0px;
+} 
+
+/* staff_logs.html */
+.search_btn_sl {
+  margin-left: 50px;
+  height: 38px;
+
+}
+
+
+.clear_btn {
+  margin-left: 20px;
+  height: 38px;
+}
+
+/* staff_create.html */
+ul.errorlist {
+  color: #e55353;          /* Bootstrap の “danger” に近い赤 */
+  font-size: 0.875rem;     
+}
+
+.col-auto {
+  padding-left: 0px;
+}
+/* settings_staff_profile.html */
+.col-md-4 {
+  padding-right: 0px;
+}
+
+.search_btn_ssp {
+  margin-left: 0px;
+  height: 38px;
+}
+
+/* payroll_config.html */
+/* 締め日 */
+label[for="id_closing_day"] {
+  font-size: 20px;   
+  font-weight: 500;    
+  margin-bottom: 0px;
+}
+
+/* 数値入力ボックス */
+input.form-control--narrow {
+  max-width: 50px;
+  padding: 3px 6px 3px 6px;
+  margin-left: 50px;
+  height: 30px;
+  border: 1px solid #000000;
+}
+
+/* 特別時給 */
+label[for="id_special_rate"] {
+  font-size: 20px;   
+  font-weight: 500;    
+  margin-bottom: 0px;
+}
+
+/* 数値入力ボックス */
+.special-rate-input {
+  max-width: 65px;
+  padding: 3px 6px 3px 6px;
+  margin-left: 10px;
+  height: 30px;
+  border: 1px solid #000000;
+}
+
+.closing_day {
+  margin: 10px 0px 0px 10px;
+}
+
+.special_rate {
+  margin: 9px 0px 0px 10px;
+}
+
+
+
+/* ==== 背景画像は qr-top ページのみ ==== */
+body:not(.qr-top) {
+  background: none !important;
+  margin: 0 !important;
+}
+
+
+/* ===== カメラ表示のラッパと左側の矢印 ===== */
+.reader-wrap{ position: relative; }
+.reader-wrap .arrow-left{
+  display: none;
+  position: absolute;
+  left: -2.2em;    /* 左端の外側から生やす */
+  right: auto;
+  top: 50%;
+  transform: translateY(-50%) scaleX(0.8);
+  font-size: clamp(48px, 10vw, 120px);
+  line-height: 1;
+  color: red;
+  animation: stretchFromLeft 1.1s ease-in-out infinite alternate;
+}
+.scanner-on .reader-wrap .arrow-left{ display: block; }
+
+@keyframes stretchFromLeft{
+  0%   { transform: translateY(-50%) scaleX(0.6); opacity: .9; }
+  60%  { transform: translateY(-50%) scaleX(1.4); opacity: 1; }
+  100% { transform: translateY(-50%) scaleX(0.6); opacity: .9; }
+}
+
+/* スキャンUIでは上部の矢印は非表示（左側の矢印に一本化） */
+.scanner-on #headline .arrow-down{ display: none !important; }
+
+/* ===== 8インチ級（横幅 700〜900px 目安）ではカメラを小さく ===== */
+@media (min-width: 700px) and (max-width: 900px){
+  .scanner-on #reader{ width: min(62vw, 420px) !important; }
+  .scanner-on #reader-wrap{ width: min(62vw, 420px) !important; }
+}
+
+/* カメラ枠を画面の中央に寄せる */
+#reader-wrap{ margin-left: auto; margin-right: auto; }
+.scanner-on #reader-wrap{ margin-left: auto !important; margin-right: auto !important; }
+
+/* 矢印の真上に1行目（カメラはこちら）を表示 */
+.reader-wrap .arrow-caption{
+  display: none;
+  position: absolute;
+  left: -6.2em;            /* 矢印と同じ基準位置 */
+  top: 50%;
+  transform: translate(-15%, -260%); /* 矢印の“真上”に寄せる */
+  font-weight: 1000;
+  white-space: nowrap;
+  font-size: clamp(18px, 3.8vw, 20px);
+  -webkit-text-stroke: 1px #33c7f8;
+  text-shadow:
+    2px 0 0 #fff, -1px 0 0 #fff,
+    0 2px 0 #fff,  0 -1px 0 #fff,
+    1px 1px 0 #fff, -1px 1px 0 #fff,
+    1px -1px 0 #fff,-1px -1px 0 #fff;
+  color: inherit; /* 背景に合わせた縁取り維持 */
+  pointer-events: none;
+}
+.scanner-on .reader-wrap .arrow-caption{ display:block; }
+
+/* 8インチ帯は2行目（中央の案内文）を30pxに固定 */
+@media (min-width: 700px) and (max-width: 900px){
+  .scanner-on #headline .top_message{ font-size: 30px !important; }
+}
+
+/* 矢印の真下に2行目（カメラにQRコードをかざしてください）を表示 */
+.reader-wrap .arrow-caption-2{
+  display: none;
+  position: absolute;
+  left: -4.2em;                 /* 矢印と同じ基準位置（左に揃える） */
+  top: 50%;
+  transform: translate(-35%, 60%); /* 矢印の“下”に配置（2行ぶん下げる） */
+  font-weight: 1000;
+  white-space: nowrap;
+  font-size: clamp(18px, 3.6vw, 32px);
+  -webkit-text-stroke: 1px #33c7f8;
+  text-shadow:
+    2px 0 0 #fff, -1px 0 0 #fff,
+    0 2px 0 #fff,  0 -1px 0 #fff,
+    1px 1px 0 #fff, -1px 1px 0 #fff,
+    1px -1px 0 #fff,-1px -1px 0 #fff;
+  color: inherit;
+  pointer-events: none;
+}
+.scanner-on .reader-wrap .arrow-caption-2{ display:block; }
+
+/* スキャン中は中央見出しの文言は隠す（矢印下へ移動したため） */
+.scanner-on #headline .top_message{ display: none !important; }
+
+/* 8インチ帯は2行目（矢印下の案内文）を20pxに固定 */
+@media (min-width: 700px) and (max-width: 900px){
+  .scanner-on .reader-wrap .arrow-caption-2{ font-size: 20px !important; }
+}
+
+/* JSで付与する8インチ判定クラスでサイズを強制 */
+.is-8inch.scanner-on .reader-wrap .arrow-caption-2{ font-size: 20px !important; }

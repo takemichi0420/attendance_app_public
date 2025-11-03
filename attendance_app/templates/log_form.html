@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}ログ編集{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:640px;">
+  <h3 class="mb-4">ログを編集</h3>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+      {{ form.timestamp.label_tag }}{{ form.timestamp }}
+    </div>
+
+    <div class="mb-3">
+      {{ form.action.label_tag }}{{ form.action }}
+    </div>
+
+    <button class="btn btn-primary">保存</button>
+    <a class="btn btn-outline-secondary"
+       href="{% url 'attendance:staff_logs' object.staff_id %}">
+       戻る
+    </a>
+  </form>
+</div>
+{% endblock %}

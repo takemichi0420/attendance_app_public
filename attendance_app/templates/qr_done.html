@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}登録完了{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="card mx-auto" style="max-width:640px;">
+    <div class="card-body text-center">
+
+      <h2 class="card-title mb-2">
+        {{ staff.name }} さん
+        {% if action_label %}
+          {{ action_label }}
+        {% elif action == 'in' %}
+          出勤
+        {% elif action == 'out' %}
+          退勤
+        {% else %}
+          打刻
+        {% endif %}
+        を登録しました
+      </h2>
+
+      <p class="text-muted mb-4"><span id="count">5</span> 秒後にトップへ戻ります…</p>
+
+      <h5 class="text-start">本日の登録履歴</h5>
+      <div class="table-responsive">
+        <table class="table table-sm table-striped align-middle mb-0">
+          <thead>
+            <tr>
+              <th style="width:40%;">時刻</th>
+              <th style="width:60%;">区分</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in logs %}
+              <tr>
+                <td>{{ log.timestamp|date:"H:i:s" }}</td>
+                <td>{{ log.get_action_display|default:log.action }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="2" class="text-center text-muted">本日の登録はまだありません</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-4">
+        <a href="{% url 'attendance:qr_top' %}" class="btn btn-primary">トップへ戻る</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    const backUrl = "{% url 'attendance:qr_top' %}";
+    let n = 5;
+    const span = document.getElementById("count");
+    const tick = () => {
+      n -= 1;
+      if (span) span.textContent = n;
+      if (n <= 0) { window.location.href = backUrl; clearInterval(timer); }
+    };
+    const timer = setInterval(tick, 1000);
+  })();
+</script>
+{% endblock %}

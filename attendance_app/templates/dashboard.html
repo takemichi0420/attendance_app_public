@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ダッシュボード{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:640px;">
+
+  {% if is_admin_view %}
+    <div class="alert alert-warning p-2 mb-3 small">※ 管理者閲覧モード</div>
+  {% endif %}
+
+  <h2 class="mb-4">ようこそ {{ user.get_full_name|default:user.username }} さん</h2>
+
+  <!-- 打刻ボタン類 -->
+  <div class="d-flex gap-2 flex-wrap mb-4">
+    <!-- 出勤 -->
+    <form method="post" action="{% url 'attendance:register_action' %}">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="in">
+      <button class="btn btn-success">出勤</button>
+    </form>
+
+    <!-- 退勤 -->
+    <form method="post" action="{% url 'attendance:register_action' %}">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="out">
+      <button class="btn btn-danger">退勤</button>
+    </form>
+
+    {% if last_log %}
+      <!-- 取消 -->
+      <form method="post" action="{% url 'attendance:cancel_last' %}" class="ms-auto">
+        {% csrf_token %}
+        <button class="btn btn-outline-secondary">直前打刻を取消</button>
+      </form>
+    {% endif %}
+  </div>
+
+  {% if last_log %}
+    <p class="small text-muted">最新打刻 : {{ last_log.get_action_display }} @ {{ last_log.timestamp|date:"Y-m-d H:i" }}</p>
+  {% endif %}
+
+  <!-- 本日の打刻一覧 -->
+  <h5 class="mt-5">本日の打刻</h5>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr><th>時刻</th><th>種別</th></tr>
+    </thead>
+    <tbody>
+      {% for log in today_logs %}
+        <tr>
+          <td>{{ log.timestamp|time:"H:i" }}</td>
+          <td>{{ log.get_action_display }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="2" class="text-center">本日の打刻はありません</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+{% endblock %}
